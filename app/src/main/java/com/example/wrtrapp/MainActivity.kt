@@ -32,6 +32,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme {
                 val scope = rememberCoroutineScope()
+
                 var allWords by remember { mutableStateOf<List<NounEntity>>(emptyList()) }
                 var currentWord by remember { mutableStateOf<NounEntity?>(null) }
                 var resultText by remember { mutableStateOf("") }
@@ -39,11 +40,16 @@ class MainActivity : ComponentActivity() {
                 var correctCount by remember { mutableStateOf(0) }
                 var incorrectCount by remember { mutableStateOf(0) }
 
+                var usedWordIds by remember { mutableStateOf(mutableSetOf<Long>()) }
+
+                // Загрузка слов при старте
                 LaunchedEffect(Unit) {
                     val loaded = dao.getAll()
                     if (loaded.isNotEmpty()) {
                         allWords = loaded
-                        currentWord = loaded.random()
+                        val first = loaded.random()
+                        currentWord = first
+                        usedWordIds.add(first.id)
                     } else {
                         resultText = "⚠️ Нет слов в базе"
                     }
@@ -63,20 +69,13 @@ class MainActivity : ComponentActivity() {
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                         listOf("der", "die", "das").forEach { choice ->
                             Button(onClick = {
-                                if (currentWord != null) {
-                                    val correct = choice == currentWord!!.article
-                                    resultText = if (correct) {
+                                currentWord?.let { word ->
+                                    if (choice == word.article) {
                                         correctCount++
-                                        "✅ Правильно!"
+                                        resultText = "✅ Правильно! ${word.article} ${word.word}"
                                     } else {
                                         incorrectCount++
-                                        "❌ Неправильно. Было: ${currentWord!!.article}"
-                                    }
-
-                                    scope.launch {
-                                        kotlinx.coroutines.delay(800)
-                                        currentWord = allWords.random()
-                                        resultText = ""
+                                        resultText = "❌ Неправильно. Было: ${word.article} ${word.word}"
                                     }
                                 }
                             }) {
@@ -85,23 +84,44 @@ class MainActivity : ComponentActivity() {
                         }
                     }
 
-                    Text(text = resultText)
+                    Text(resultText)
+
+                    Button(onClick = {
+                        if (allWords.isNotEmpty()) {
+                            val unusedWords = allWords.filterNot { usedWordIds.contains(it.id) }
+
+                            if (unusedWords.isNotEmpty()) {
+                                val next = unusedWords.random()
+                                currentWord = next
+                                usedWordIds.add(next.id)
+                                resultText = ""
+                            } else {
+                                resultText = "🎉 Вы прошли все слова!"
+                                usedWordIds.clear()
+                                currentWord = null
+                            }
+                        }
+                    }) {
+                        Text("Следующее слово")
+                    }
 
                     HorizontalDivider()
 
                     Text("Правильных: $correctCount")
-                    Text("Неправильных: $incorrectCount")
+                    Text("Ошибок: $incorrectCount")
 
                     Button(onClick = {
                         correctCount = 0
                         incorrectCount = 0
                         resultText = "🔄 Сброшено"
                     }) {
-                        Text("Сбросить счётчик")
+                        Text("Сбросить счётчики")
                     }
                 }
             }
         }
+
+
 
     }
 }
