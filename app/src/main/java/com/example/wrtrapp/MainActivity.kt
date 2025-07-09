@@ -32,13 +32,21 @@ class MainActivity : ComponentActivity() {
         setContent {
             MaterialTheme {
                 val scope = rememberCoroutineScope()
+                var allWords by remember { mutableStateOf<List<NounEntity>>(emptyList()) }
                 var currentWord by remember { mutableStateOf<NounEntity?>(null) }
                 var resultText by remember { mutableStateOf("") }
 
-                // Загружаем слово при старте
+                var correctCount by remember { mutableStateOf(0) }
+                var incorrectCount by remember { mutableStateOf(0) }
+
                 LaunchedEffect(Unit) {
-                    val all = dao.getAll()
-                    currentWord = all.random()
+                    val loaded = dao.getAll()
+                    if (loaded.isNotEmpty()) {
+                        allWords = loaded
+                        currentWord = loaded.random()
+                    } else {
+                        resultText = "⚠️ Нет слов в базе"
+                    }
                 }
 
                 Column(
@@ -56,10 +64,19 @@ class MainActivity : ComponentActivity() {
                         listOf("der", "die", "das").forEach { choice ->
                             Button(onClick = {
                                 if (currentWord != null) {
-                                    resultText = if (choice == currentWord!!.article) {
+                                    val correct = choice == currentWord!!.article
+                                    resultText = if (correct) {
+                                        correctCount++
                                         "✅ Правильно!"
                                     } else {
+                                        incorrectCount++
                                         "❌ Неправильно. Было: ${currentWord!!.article}"
+                                    }
+
+                                    scope.launch {
+                                        kotlinx.coroutines.delay(800)
+                                        currentWord = allWords.random()
+                                        resultText = ""
                                     }
                                 }
                             }) {
@@ -67,9 +84,24 @@ class MainActivity : ComponentActivity() {
                             }
                         }
                     }
-                    Text(resultText)
+
+                    Text(text = resultText)
+
+                    HorizontalDivider()
+
+                    Text("Правильных: $correctCount")
+                    Text("Неправильных: $incorrectCount")
+
+                    Button(onClick = {
+                        correctCount = 0
+                        incorrectCount = 0
+                        resultText = "🔄 Сброшено"
+                    }) {
+                        Text("Сбросить счётчик")
+                    }
                 }
             }
         }
+
     }
 }
