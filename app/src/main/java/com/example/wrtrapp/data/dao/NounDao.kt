@@ -15,4 +15,7 @@ interface NounDao {
 
     @Query("SELECT * FROM nouns WHERE word = :word LIMIT 1")
     suspend fun findByWord(word: String): NounEntity?
+
+    @Query("DELETE FROM nouns")
+    suspend fun clear()
 }
