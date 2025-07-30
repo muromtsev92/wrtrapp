@@ -3,7 +3,7 @@ package com.example.wrtrapp.data.repository
 import com.example.wrtrapp.data.dao.NounDao
 import com.example.wrtrapp.data.entities.NounEntity
 
-class ArticleRepository(private val nounDao: NounDao) {
+class NounRepository(private val nounDao: NounDao) {
 
     suspend fun getAllNouns(): List<NounEntity> {
         return nounDao.getAll()

@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.wrtrapp.data.DatabaseProvider
 import com.example.wrtrapp.data.entities.NounEntity
-import com.example.wrtrapp.data.repository.ArticleRepository
+import com.example.wrtrapp.data.repository.NounRepository
 import com.example.wrtrapp.ui.state.ArticleUiState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
 
 class ArticleQuizViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: ArticleRepository =
-        ArticleRepository(DatabaseProvider.getDatabase(application).nounDao())
+    private val repository: NounRepository =
+        NounRepository(DatabaseProvider.getDatabase(application).nounDao())
 
     private val _uiState = MutableStateFlow(ArticleUiState())
     val uiState: StateFlow<ArticleUiState> = _uiState
