@@ -44,7 +44,12 @@ fun ImportWordsScreen(
         Button(
             onClick = {
                 viewModel.importWords(jsonInput) { success ->
-                    message = if (success) "Слова добавлены!" else "Ошибка импорта"
+                    if (success) {
+                        message = "Слова добавлены!"
+                        jsonInput = ""
+                    } else {
+                        message = "Ошибка импорта"
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()

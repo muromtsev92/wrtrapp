@@ -22,6 +22,8 @@ class ArticleQuizViewModel(application: Application) : AndroidViewModel(applicat
     private var allWords: List<NounEntity> = emptyList()
     private val usedWordIds = mutableSetOf<Long>()
 
+    var stopOnError = true // можно будет менять из настроек режима
+
     fun loadWords() {
         viewModelScope.launch {
             val loaded = repository.getAllNouns()
@@ -40,15 +42,30 @@ class ArticleQuizViewModel(application: Application) : AndroidViewModel(applicat
         val word = _uiState.value.currentWord ?: return
         val correct = choice == word.article
 
-        _uiState.value = _uiState.value.copy(
-            resultText = if (correct)
-                "✅ Правильно! ${word.article} ${word.word}"
-            else
-                "❌ Неправильно. Было: ${word.article} ${word.word}",
-            correctCount = _uiState.value.correctCount + if (correct) 1 else 0,
-            incorrectCount = _uiState.value.incorrectCount + if (correct) 0 else 1
-        )
+        if (correct) {
+            _uiState.value = _uiState.value.copy(
+                correctCount = _uiState.value.correctCount + 1,
+                resultText = "✅ Правильно! ${word.article} ${word.word}"
+            )
+            nextWord() // сразу новое слово
+        } else {
+            _uiState.value = _uiState.value.copy(
+                incorrectCount = _uiState.value.incorrectCount + 1,
+                resultText = "❌ Неправильно. Было: ${word.article} ${word.word}"
+            )
+
+            if (stopOnError) {
+                // Сигнализируем конец игры
+                _uiState.value = _uiState.value.copy(
+                    currentWord = null,
+                    resultText = "Игра окончена! Счёт: ${_uiState.value.correctCount}"
+                )
+            } else {
+                nextWord()
+            }
+        }
     }
+
 
     fun nextWord() {
         val unused = allWords.filterNot { usedWordIds.contains(it.id) }
