@@ -35,7 +35,7 @@ fun ImportWordsScreen(
         OutlinedTextField(
             value = jsonInput,
             onValueChange = { jsonInput = it },
-            label = { Text("Вставьте JSON") },
+            label = { Text("Вставьте слова в формате JSON") },
             modifier = Modifier.fillMaxWidth().weight(1f)
         )
 
