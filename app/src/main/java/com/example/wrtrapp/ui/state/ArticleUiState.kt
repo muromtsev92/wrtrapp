@@ -6,5 +6,8 @@ data class ArticleUiState(
     val currentWord: NounEntity? = null,
     val resultText: String = "",
     val correctCount: Int = 0,
-    val incorrectCount: Int = 0
+    val incorrectCount: Int = 0,
+    val mistakes: List<NounEntity> = emptyList(),
+    val showMistakesScreen: Boolean = false,
+    val stopOnError: Boolean = false
 )

@@ -10,7 +10,8 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun GameListScreen(
     onPlayClick: () -> Unit,
-    onAddWordsClick: () -> Unit
+    onAddWordsJsonClick: () -> Unit,
+    onAddWordManualClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -19,18 +20,25 @@ fun GameListScreen(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Выберите игру", style = MaterialTheme.typography.titleLarge)
+        Text("Выберите действие", style = MaterialTheme.typography.titleLarge)
 
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(onClick = onPlayClick, modifier = Modifier.fillMaxWidth()) {
-            Text("Угадай артикль")
+            Text("Играть (угадай артикль)")
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedButton(onClick = onAddWordsClick, modifier = Modifier.fillMaxWidth()) {
-            Text("Добавить слова")
+        OutlinedButton(onClick = onAddWordsJsonClick, modifier = Modifier.fillMaxWidth()) {
+            Text("Добавить слова (JSON)")
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedButton(onClick = onAddWordManualClick, modifier = Modifier.fillMaxWidth()) {
+            Text("Добавить слово вручную")
         }
     }
 }
+

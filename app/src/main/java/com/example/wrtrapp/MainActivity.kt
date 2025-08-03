@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.runtime.*
+import com.example.wrtrapp.ui.screens.AddWordScreen
 import com.example.wrtrapp.ui.screens.ArticleQuizScreen
 import com.example.wrtrapp.ui.screens.GameListScreen
 import com.example.wrtrapp.ui.screens.ImportWordsScreen
@@ -26,14 +27,14 @@ class MainActivity : ComponentActivity() {
             when (currentScreen) {
                 "list" -> GameListScreen(
                     onPlayClick = { currentScreen = "quiz" },
-                    onAddWordsClick = { currentScreen = "import" }
+                    onAddWordsJsonClick = { currentScreen = "import" },
+                    onAddWordManualClick = { currentScreen = "manual" }
                 )
-
-                "quiz" -> ArticleQuizScreen()
-                "import" -> ImportWordsScreen(
-                    onBack = { currentScreen = "list" }
-                )
+                "quiz" -> ArticleQuizScreen(onBackToMenu = { currentScreen = "list" })
+                "import" -> ImportWordsScreen(onBack = { currentScreen = "list" })
+                "manual" -> AddWordScreen(onBack = { currentScreen = "list" })
             }
+
         }
     }
 }
