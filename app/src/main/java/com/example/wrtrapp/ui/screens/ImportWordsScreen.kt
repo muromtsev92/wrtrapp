@@ -35,7 +35,7 @@ fun ImportWordsScreen(
         OutlinedTextField(
             value = jsonInput,
             onValueChange = { jsonInput = it },
-            label = { Text("Вставьте JSON") },
+            label = { Text("Вставьте слова в формате JSON") },
             modifier = Modifier.fillMaxWidth().weight(1f)
         )
 
@@ -44,7 +44,12 @@ fun ImportWordsScreen(
         Button(
             onClick = {
                 viewModel.importWords(jsonInput) { success ->
-                    message = if (success) "Слова добавлены!" else "Ошибка импорта"
+                    if (success) {
+                        message = "Слова добавлены!"
+                        jsonInput = ""
+                    } else {
+                        message = "Ошибка импорта"
+                    }
                 }
             },
             modifier = Modifier.fillMaxWidth()
